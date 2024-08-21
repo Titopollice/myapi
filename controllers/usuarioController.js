@@ -11,7 +11,8 @@ exports.getUsuarioById = (req, res) => {
   const { id } = req.params;
   db.query("SELECT * FROM usuario WHERE usuarioID = ?", [id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(result);
+    if (result.length === 0) return res.status(404).json({ message: "Usuário não encontrado" });
+    res.json(result[0]);
   });
 };
 
@@ -26,6 +27,7 @@ exports.createUsuario = (req, res) => {
     cargo,
     dataNascimento,
     senha,
+    tipoUsuario_idtipoUsuario,
   } = req.body;
 
   db.query(
@@ -39,45 +41,19 @@ exports.createUsuario = (req, res) => {
       cargo,
       dataNascimento,
       senha,
-    ],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: result.insertId });
-    }
-  );
-};
-
-exports.updateUsuario = (req, res) => {
-  const { id } = req.params;
-  const {
-    usuarioLogin,
-    nomeCompleto,
-    email,
-    telefone,
-    cpf,
-    cargo,
-    dataNascimento,
-    senha,
-    tipoUsuario_idtipoUsuario,
-  } = req.body;
-
-  db.query(
-    "UPDATE usuario SET usuarioLogin = ?, nomeCompleto = ?, email = ?, telefone = ?, cpf = ?, cargo = ?, dataNascimento = ?, senha = ?, tipoUsuario_idtipoUsuario = ? WHERE usuarioID = ?",
-    [
-      usuarioLogin,
-      nomeCompleto,
-      email,
-      telefone,
-      cpf,
-      cargo,
-      dataNascimento,
-      senha,
       tipoUsuario_idtipoUsuario,
-      id,
     ],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: "Usuario updated successfully" });
+
+      // Após a inserção, recupere o usuário recém-criado usando o ID gerado.
+      const newUserId = result.insertId;
+      db.query("SELECT * FROM usuario WHERE usuarioID = ?", [newUserId], (err, newUser) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Retorne o novo usuário completo
+        res.status(201).json(newUser[0]);
+      });
     }
   );
 };
@@ -86,6 +62,7 @@ exports.deleteUsuario = (req, res) => {
   const { id } = req.params;
   db.query("DELETE FROM usuario WHERE usuarioID = ?", [id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Usuario deleted successfully" });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Usuário não encontrado" });
+    res.json({ message: "Usuário excluído com sucesso" });
   });
 };

@@ -11,7 +11,7 @@ class Usuario {
 
   static create(data, callback) {
     db.query(
-      "INSERT INTO usuario (usuarioLogin, nomeCompleto, email, telefone, cpf, cargo, dataNascimento, senha,) VALUES (?, ?, ?, ?, ?, ?, ?, ?,)",
+      "INSERT INTO usuario (usuarioLogin, nomeCompleto, email, telefone, cpf, cargo, dataNascimento, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         data.usuarioLogin,
         data.nomeCompleto,

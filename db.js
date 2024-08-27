@@ -3,10 +3,17 @@ const mysql = require('mysql2');
 
 // Configuração da conexão com o banco de dados usando variáveis de ambiente
 const db = mysql.createConnection({
+<<<<<<< Updated upstream
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
+=======
+  host: "localhost",
+  user: "root",
+  password: "30042002",
+  database: "db_adegas",
+>>>>>>> Stashed changes
 });
 
 db.connect((err) => {

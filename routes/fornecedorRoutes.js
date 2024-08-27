@@ -1,7 +1,6 @@
-// routes/fornecedor.js
 const express = require("express");
 const router = express.Router();
-const Fornecedor = require("../models/fornecedorModel");
+const Fornecedor = require("../models/fornecedorModel"); // Certifique-se de que o caminho e o nome estão corretos
 
 router.get("/", (req, res) => {
   Fornecedor.getAll((err, results) => {
@@ -31,7 +30,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.patch("/:id", (req, res) => {
   Fornecedor.delete(req.params.id, (err, result) => {
     if (err) res.status(500).json({ error: err.message });
     else res.json({ affectedRows: result.affectedRows });

@@ -1,4 +1,3 @@
-// controllers/fornecedorController.js
 const db = require("../db");
 
 exports.getAllFornecedores = (req, res) => {
@@ -24,20 +23,26 @@ exports.createFornecedor = (req, res) => {
   const {
     nome,
     cnpj,
-    idInformacoesPessoais,
-    idEndereco,
+    razao,
+    numero,
     contato_idContato,
-    usuario_usuarioID,
+    bairro,
+    telefone,
+    complemento,
+    email,
   } = req.body;
   db.query(
-    "INSERT INTO fornecedor (nome, cnpj, idInformacoesPessoais, idEndereco, contato_idContato, usuario_usuarioID) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO fornecedor (nome, cnpj, razao, numero, contato_idContato, bairro, telefone, complemento, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [
       nome,
       cnpj,
-      idInformacoesPessoais,
-      idEndereco,
+      razao,
+      numero,
       contato_idContato,
-      usuario_usuarioID,
+      bairro,
+      telefone,
+      complemento,
+      email,
     ],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -51,20 +56,26 @@ exports.updateFornecedor = (req, res) => {
   const {
     nome,
     cnpj,
-    idInformacoesPessoais,
-    idEndereco,
+    razao,
+    numero,
     contato_idContato,
-    usuario_usuarioID,
+    bairro,
+    telefone,
+    complemento,
+    email,
   } = req.body;
   db.query(
-    "UPDATE fornecedor SET nome = ?, cnpj = ?, idInformacoesPessoais = ?, idEndereco = ?, contato_idContato = ?, usuario_usuarioID = ? WHERE fornecedorID = ?",
+    "UPDATE fornecedor SET nome = ?, cnpj = ?, razao = ?, numero = ?, contato_idContato = ?, bairro = ?, telefone = ?, complemento = ?, email = ? WHERE fornecedorID = ?",
     [
       nome,
       cnpj,
-      idInformacoesPessoais,
-      idEndereco,
+      razao,
+      numero,
       contato_idContato,
-      usuario_usuarioID,
+      bairro,
+      telefone,
+      complemento,
+      email,
       id,
     ],
     (err, result) => {

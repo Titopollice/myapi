@@ -1,4 +1,3 @@
-// models/Fornecedor.js
 const db = require("../db");
 
 class Fornecedor {
@@ -12,14 +11,17 @@ class Fornecedor {
 
   static create(data, callback) {
     db.query(
-      "INSERT INTO fornecedor (nome, cnpj, idInformacoesPessoais, idEndereco, contato_idContato, usuario_usuarioID) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO fornecedor (nome, cnpj, razao, numero, contato_idContato, bairro, telefone, complemento, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         data.nome,
         data.cnpj,
-        data.idInformacoesPessoais,
-        data.idEndereco,
+        data.razao,
+        data.numero,
         data.contato_idContato,
-        data.usuario_usuarioID,
+        data.bairro,
+        data.telefone,
+        data.complemento,
+        data.email,
       ],
       callback
     );
@@ -27,14 +29,17 @@ class Fornecedor {
 
   static update(id, data, callback) {
     db.query(
-      "UPDATE fornecedor SET nome = ?, cnpj = ?, idInformacoesPessoais = ?, idEndereco = ?, contato_idContato = ?, usuario_usuarioID = ? WHERE fornecedorID = ?",
+      "UPDATE fornecedor SET nome = ?, cnpj = ?, razao = ?, numero = ?, contato_idContato = ?, bairro = ?, telefone = ?, complemento = ?, email = ? WHERE fornecedorID = ?",
       [
         data.nome,
         data.cnpj,
-        data.idInformacoesPessoais,
-        data.idEndereco,
+        data.razao,
+        data.numero,
         data.contato_idContato,
-        data.usuario_usuarioID,
+        data.bairro,
+        data.telefone,
+        data.complemento,
+        data.email,
         id,
       ],
       callback
@@ -42,7 +47,22 @@ class Fornecedor {
   }
 
   static delete(id, callback) {
-    db.query("DELETE FROM fornecedor WHERE fornecedorID = ?", [id], callback);
+    console.log("Executing query: SELECT status FROM fornecedor WHERE fornecedorID = ?", [id]);
+
+    db.query("SELECT status FROM fornecedor WHERE fornecedorID = ?", [id], (err, results) => {
+      if (err) return callback(err);
+
+      const currentStatus = results[0].status;
+      const newStatus = currentStatus === 'Ativo' ? 'Inativo' : 'Ativo';
+
+      console.log(`Executing query: UPDATE fornecedor SET status = ? WHERE fornecedorID = ?`, [newStatus, id]);
+      
+      db.query(
+        "UPDATE fornecedor SET status = ? WHERE fornecedorID = ?",
+        [newStatus, id],
+        callback
+      );
+    });
   }
 }
 

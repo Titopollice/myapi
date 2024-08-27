@@ -66,3 +66,5 @@ exports.deleteUsuario = (req, res) => {
     res.json({ message: "Usuário excluído com sucesso" });
   });
 };
+
+

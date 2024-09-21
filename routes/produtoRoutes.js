@@ -31,7 +31,8 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+// Alterar o status do produto em vez de deletar
+router.patch("/:id", (req, res) => {
   Produto.delete(req.params.id, (err, result) => {
     if (err) res.status(500).json({ error: err.message });
     else res.json({ affectedRows: result.affectedRows });

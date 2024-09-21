@@ -12,12 +12,17 @@ class Produto {
 
   static create(data, callback) {
     db.query(
-      "INSERT INTO produto (nomeProduto, dataValidade, categoriaProduto_idcategoriaProduto, usuario_usuarioID) VALUES (?, ?, ?, ?)",
+      "INSERT INTO produto (nomeProduto, safra, paisdeorigem, tipodeuva, classificacao, preco, estoque, codigodebarras, temperatura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         data.nomeProduto,
-        data.dataValidade,
-        data.categoriaProduto_idcategoriaProduto,
-        data.usuario_usuarioID,
+        data.safra,
+        data.paisdeorigem,
+        data.tipodeuva,
+        data.classificacao,
+        data.preco,
+        data.estoque,
+        data.codigodebarras,
+        data.temperatura,
       ],
       callback
     );
@@ -25,12 +30,17 @@ class Produto {
 
   static update(id, data, callback) {
     db.query(
-      "UPDATE produto SET nomeProduto = ?, dataValidade = ?, categoriaProduto_idcategoriaProduto = ?, usuario_usuarioID = ? WHERE produtoID = ?",
+      "UPDATE produto SET nomeProduto = ?, safra = ?, paisdeorigem = ?, tipodeuva = ?, classificacao = ?, preco = ?, estoque = ?, codigodebarras = ?, temperatura = ? WHERE produtoID = ?",
       [
         data.nomeProduto,
-        data.dataValidade,
-        data.categoriaProduto_idcategoriaProduto,
-        data.usuario_usuarioID,
+        data.safra,
+        data.paisdeorigem,
+        data.tipodeuva,
+        data.classificacao,
+        data.preco,
+        data.estoque,
+        data.codigodebarras,
+        data.temperatura,
         id,
       ],
       callback
@@ -38,8 +48,24 @@ class Produto {
   }
 
   static delete(id, callback) {
-    db.query("DELETE FROM produto WHERE produtoID = ?", [id], callback);
+    db.query(
+      "SELECT status FROM produto WHERE produtoID = ?",
+      [id],
+      (err, results) => {
+        if (err) return callback(err);
+
+        const currentStatus = results[0].status;
+        const newStatus = currentStatus === "Ativo" ? "Inativo" : "Ativo";
+
+        db.query(
+          "UPDATE produto SET status = ? WHERE produtoID = ?",
+          [newStatus, id],
+          callback
+        );
+      }
+    );
   }
+  
 }
 
 module.exports = Produto;

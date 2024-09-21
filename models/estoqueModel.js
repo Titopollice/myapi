@@ -1,4 +1,3 @@
-// models/Estoque.js
 const db = require("../db");
 
 class Estoque {
@@ -11,34 +10,173 @@ class Estoque {
   }
 
   static create(data, callback) {
-    db.query(
-      "INSERT INTO estoque (quantidadeMinina, ultimaMovimentacao, Produto_produtoID, usuario_usuarioID) VALUES (?, ?, ?, ?)",
-      [
-        data.quantidadeMinina,
-        data.ultimaMovimentacao,
-        data.Produto_produtoID,
-        data.usuario_usuarioID,
-      ],
-      callback
-    );
+    // Início de uma transação para garantir consistência nos dados
+    db.beginTransaction((err) => {
+      if (err) return callback(err);
+
+      // Inserir na tabela de estoque
+      db.query(
+        "INSERT INTO estoque (quantidade, DataDaMovimentacao, Produto_produtoID, IdFornecedor) VALUES (?, ?, ?, ?)",
+        [
+          data.quantidade,
+          data.DataDaMovimentacao,
+          data.Produto_produtoID,
+          data.IdFornecedor,
+        ],
+        (err, result) => {
+          if (err) {
+            return db.rollback(() => {
+              callback(err);
+            });
+          }
+
+          // Atualizar o campo 'estoque' na tabela produto
+          db.query(
+            "UPDATE produto SET estoque = estoque + ? WHERE produtoID = ?",
+            [data.quantidade, data.Produto_produtoID],
+            (err, result) => {
+              if (err) {
+                return db.rollback(() => {
+                  callback(err);
+                });
+              }
+
+              // Se tudo deu certo, comitar a transação
+              db.commit((err) => {
+                if (err) {
+                  return db.rollback(() => {
+                    callback(err);
+                  });
+                }
+                callback(null, result);
+              });
+            }
+          );
+        }
+      );
+    });
   }
 
   static update(id, data, callback) {
-    db.query(
-      "UPDATE estoque SET quantidadeMinina = ?, ultimaMovimentacao = ?, Produto_produtoID = ?, usuario_usuarioID = ? WHERE idEstoque = ?",
-      [
-        data.quantidadeMinina,
-        data.ultimaMovimentacao,
-        data.Produto_produtoID,
-        data.usuario_usuarioID,
-        id,
-      ],
-      callback
-    );
+    db.beginTransaction((err) => {
+      if (err) return callback(err);
+
+      // Primeiro, buscamos a quantidade atual do estoque para calcular a diferença
+      db.query(
+        "SELECT quantidade FROM estoque WHERE idEstoque = ?",
+        [id],
+        (err, result) => {
+          if (err) {
+            return db.rollback(() => {
+              callback(err);
+            });
+          }
+
+          const quantidadeAtual = result[0].quantidade;
+          const diferenca = data.quantidade - quantidadeAtual;
+
+          // Atualizar a tabela de estoque
+          db.query(
+            "UPDATE estoque SET quantidade = ?, DataDaMovimentacao = ?, Produto_produtoID = ?, IdFornecedor = ? WHERE idEstoque = ?",
+            [
+              data.quantidade,
+              data.DataDaMovimentacao,
+              data.Produto_produtoID,
+              data.IdFornecedor,
+              id,
+            ],
+            (err, result) => {
+              if (err) {
+                return db.rollback(() => {
+                  callback(err);
+                });
+              }
+
+              // Atualizar o campo 'estoque' na tabela produto com a diferença
+              db.query(
+                "UPDATE produto SET estoque = estoque + ? WHERE produtoID = ?",
+                [diferenca, data.Produto_produtoID],
+                (err, result) => {
+                  if (err) {
+                    return db.rollback(() => {
+                      callback(err);
+                    });
+                  }
+
+                  // Se tudo deu certo, comitar a transação
+                  db.commit((err) => {
+                    if (err) {
+                      return db.rollback(() => {
+                        callback(err);
+                      });
+                    }
+                    callback(null, result);
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    });
   }
 
   static delete(id, callback) {
-    db.query("DELETE FROM estoque WHERE idEstoque = ?", [id], callback);
+    db.beginTransaction((err) => {
+      if (err) return callback(err);
+
+      // Primeiro, buscamos a quantidade e o produto relacionado ao estoque que será deletado
+      db.query(
+        "SELECT quantidade, Produto_produtoID FROM estoque WHERE idEstoque = ?",
+        [id],
+        (err, result) => {
+          if (err) {
+            return db.rollback(() => {
+              callback(err);
+            });
+          }
+
+          const quantidade = result[0].quantidade;
+          const produtoID = result[0].Produto_produtoID;
+
+          // Deletar o registro do estoque
+          db.query(
+            "DELETE FROM estoque WHERE idEstoque = ?",
+            [id],
+            (err, result) => {
+              if (err) {
+                return db.rollback(() => {
+                  callback(err);
+                });
+              }
+
+              // Subtrair a quantidade do campo 'estoque' na tabela produto
+              db.query(
+                "UPDATE produto SET estoque = estoque - ? WHERE produtoID = ?",
+                [quantidade, produtoID],
+                (err, result) => {
+                  if (err) {
+                    return db.rollback(() => {
+                      callback(err);
+                    });
+                  }
+
+                  // Se tudo deu certo, comitar a transação
+                  db.commit((err) => {
+                    if (err) {
+                      return db.rollback(() => {
+                        callback(err);
+                      });
+                    }
+                    callback(null, result);
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    });
   }
 }
 

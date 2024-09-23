@@ -1,4 +1,3 @@
-// routes/venda.js
 const express = require("express");
 const router = express.Router();
 const Venda = require("../models/vendaModel");
@@ -28,13 +27,30 @@ router.get("/:id", (req, res) => {
 });
 
 // Criar nova venda
-router.post("/", (req, res) => {
-  Venda.create(req.body, (err, result) => {
+router.post('/venda', (req, res) => {
+  const vendaData = {
+    dataVenda: req.body.dataVenda,
+    totalVenda: req.body.totalVenda,
+    desconto: req.body.desconto,
+    usuario_usuarioID: req.body.usuario_usuarioID, // Corrigido aqui
+    items: req.body.items.map(item => ({
+      produtoID: item.produtoID,
+      quantidade: item.quantidade,
+      valorproduto: item.valorproduto,
+      valortotalproduto: item.valortotalproduto,
+      valordescontoproduto: item.valordescontoproduto
+    }))
+  };
+
+  Venda.create(vendaData, (err, result) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(201).json({ message: "Venda criada com sucesso", vendaID: result.insertId });
+      return res.status(500).json({ error: 'Erro ao criar a venda', details: err });
     }
+
+    res.status(201).json({
+      message: 'Venda criada com sucesso!',
+      vendaID: result.insertId
+    });
   });
 });
 

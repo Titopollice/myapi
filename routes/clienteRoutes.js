@@ -25,6 +25,18 @@ router.get("/:id", (req, res) => {
   });
 });
 
+router.get("/nome/:nome", (req, res) => {
+  Cliente.getByName(req.params.nome, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (result.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 // Rota para criar um novo cliente
 router.post("/", (req, res) => {
   Cliente.create(req.body, (err, result) => {

@@ -16,6 +16,18 @@ router.get("/:id", (req, res) => {
   });
 });
 
+router.get("/nome/:nome", (req, res) => {
+  Fornecedor.getByName(req.params.nome, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (result.length === 0) {
+      res.status(404).json({ error: "Fornecedor não encontrado" });
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 router.post("/", (req, res) => {
   Fornecedor.create(req.body, (err, result) => {
     if (err) res.status(500).json({ error: err.message });

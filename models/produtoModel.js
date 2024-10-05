@@ -10,6 +10,10 @@ class Produto {
     db.query("SELECT * FROM produto WHERE produtoID = ?", [id], callback);
   }
 
+  static getByName(nomeProduto, callback) {
+    db.query("SELECT * FROM produto WHERE nomeProduto LIKE ?", [`%${nomeProduto}%`], callback);
+  }
+
   static create(data, callback) {
     db.query(
       "INSERT INTO produto (nomeProduto, safra, paisdeorigem, tipodeuva, classificacao, preco, estoque, codigodebarras, temperatura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -65,7 +69,6 @@ class Produto {
       }
     );
   }
-  
 }
 
 module.exports = Produto;

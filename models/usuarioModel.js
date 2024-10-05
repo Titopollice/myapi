@@ -10,6 +10,8 @@ class Usuario {
     db.query("SELECT * FROM usuario WHERE usuarioID = ?", [id], callback);
   }
 
+  
+
   static getByLogin(usuarioLogin, callback) {
     db.query(
       "SELECT * FROM usuario WHERE usuarioLogin = ?",
@@ -20,6 +22,10 @@ class Usuario {
         callback(null, results[0]);
       }
     );
+  }
+  
+  static getByName(usuarioLogin, callback) {
+    db.query("SELECT * FROM usuario WHERE usuarioLogin LIKE ?", [`%${usuarioLogin}%`], callback);
   }
 
   static create(data, callback) {

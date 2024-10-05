@@ -45,6 +45,18 @@ router.get("/:id", (req, res) => {
   });
 });
 
+router.get("/nome/:usuarioLogin", (req, res) => {
+  Usuario.getByName(req.params.usuarioLogin, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (result.length === 0) {
+      res.status(404).json({ error: "Produto não encontrado" });
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 router.post("/", (req, res) => {
   Usuario.create(req.body, (err, result) => {
     if (err) res.status(500).json({ error: err.message });

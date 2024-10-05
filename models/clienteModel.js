@@ -8,6 +8,10 @@ class Cliente {
   static getById(id, callback) {
     db.query("SELECT * FROM cliente WHERE clienteID = ?", [id], callback);
   }
+  
+  static getByName(nome, callback) {
+    db.query("SELECT * FROM cliente WHERE nome LIKE ?", [`%${nome}%`], callback);
+  }
 
   static create(data, callback) {
     db.query(

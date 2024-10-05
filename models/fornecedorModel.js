@@ -9,6 +9,10 @@ class Fornecedor {
     db.query("SELECT * FROM fornecedor WHERE fornecedorID = ?", [id], callback);
   }
 
+  static getByName(nome, callback) {
+    db.query("SELECT * FROM fornecedor WHERE nome LIKE ?", [`%${nome}%`], callback);
+  }
+
   static create(data, callback) {
     db.query(
       "INSERT INTO fornecedor (nome, cnpj, razao, numero, contato_idContato, bairro, telefone, complemento, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",

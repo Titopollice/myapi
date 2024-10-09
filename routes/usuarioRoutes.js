@@ -4,6 +4,13 @@ const Usuario = require("../models/usuarioModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authenticateToken = require("../middleware/authenticateToken");
+const usuarioController = require("../controllers/usuarioController"); // Certifique-se de ajustar o caminho para o correto
+
+// Rota para solicitar a recuperação de senha
+router.post("/forgot-password", usuarioController.forgotPassword);
+
+// Rota para redefinir a senha com o token
+router.post("/reset-password/:token", usuarioController.resetPassword);
 
 // Rota de Login
 router.post("/login", (req, res) => {

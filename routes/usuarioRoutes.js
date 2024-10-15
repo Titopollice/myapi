@@ -22,6 +22,9 @@ router.post("/login", (req, res) => {
     if (!user)
       return res.status(404).json({ message: "Usuário não encontrado" });
 
+    // Exibe os dados do usuário no console para debug
+    console.log("Usuário encontrado:", user); // <--- Aqui vamos inspecionar os dados
+
     // Compara a senha com o hash armazenado
     bcrypt.compare(senha, user.senha, (err, isMatch) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -31,7 +34,9 @@ router.post("/login", (req, res) => {
       const token = jwt.sign({ id: user.usuarioID }, "seu_segredo_jwt", {
         expiresIn: "1h",
       });
-      res.json({ token });
+
+      // Envia o token e o nome completo do usuário como resposta
+      res.json({ token, nomeUsuario: user.usuarioLogin });
     });
   });
 });

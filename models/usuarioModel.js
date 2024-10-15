@@ -11,7 +11,6 @@ class Usuario {
   }
 
   
-
   static getByLogin(usuarioLogin, callback) {
     db.query(
       "SELECT * FROM usuario WHERE usuarioLogin = ?",

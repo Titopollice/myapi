@@ -20,8 +20,9 @@ app.use("/api/produto", require("./routes/produtoRoutes"));
 app.use("/api/estoque", require("./routes/estoqueRoutes"));
 app.use("/api/venda", require("./routes/vendaRoutes"));
 app.use("/api/itemvenda", require("./routes/itemvendaRoutes"));
-app.use("/api/relatorio", require("./routes/relatorioRoutes"));
+app.use("/api/relatorios", require("./routes/relatorioRoutes"));
 app.use("/api/representante", require("./routes/representanteRoutes"));
+app.use("/api/relatorio", require("./routes/geradorRelatorioRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API is running");

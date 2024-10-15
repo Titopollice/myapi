@@ -11,18 +11,18 @@ class Venda {
 
   static create(data, callback) {
     db.query(
-      "INSERT INTO venda (dataVenda, totalVenda, desconto, usuario_usuarioID) VALUES (?, ?, ?, ?)", // Alterado aqui
+      "INSERT INTO venda (dataVenda, totalVenda, desconto, usuario_usuarioID) VALUES (?, ?, ?, ?)", 
       [
         data.dataVenda,
         data.totalVenda,
         data.desconto,
-        data.usuario_usuarioID, // Deve ser este campo
+        data.usuario_usuarioID, 
       ],
       (err, result) => {
         if (err) return callback(err);
   
         const vendaID = result.insertId;
-        const items = data.items; // Array de produtos
+        const items = data.items; 
   
         // Inserir os itens da venda (itemvenda)
         const queries = items.map((item) => {
@@ -34,23 +34,34 @@ class Venda {
                 item.valorproduto,
                 item.valortotalproduto,
                 item.valordescontoproduto,
-                vendaID, // Associar o item à venda
+                vendaID,
                 item.produtoID,
               ],
               (err) => {
-                if (err) reject(err);
-                else resolve();
+                if (err) return reject(err);
+  
+                // Atualizar o estoque do produto após inserir o item da venda
+                db.query(
+                  "UPDATE produto SET estoque = estoque - ? WHERE produtoID = ?",
+                  [item.quantidade, item.produtoID],
+                  (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                  }
+                );
               }
             );
           });
         });
   
+        // Executa todas as queries de inserção e atualização do estoque
         Promise.all(queries)
           .then(() => callback(null, result))
           .catch(callback);
       }
     );
   }
+  
   
 
   static update(id, data, callback) {

@@ -1,26 +1,24 @@
-// models/Contas.js
+// models/receber.js
 const db = require("../db");
 
 class Contas {
   // Recupera todas as contas
   static getAll(callback) {
-    db.query("SELECT * FROM contas_pagar", callback);
+    db.query("SELECT * FROM contas_receber", callback);
   }
 
   // Recupera uma conta específica por ID
   static getById(id, callback) {
-    db.query("SELECT * FROM contas_pagar WHERE contaID = ?", [id], callback);
+    db.query("SELECT * FROM contas_receber WHERE contaID = ?", [id], callback);
   }
 
   static getParcelas(contaId, callback) {
-    db.query("SELECT * FROM parcelas_pagar WHERE conta_pagar_id = ?", [contaId], (err, results) => {
+    db.query("SELECT * FROM parcelas_receber WHERE conta_pagar_id = ?", [contaId], (err, results) => {
       console.log("Resultados das parcelas:", results);
       callback(err, results);
     });
   }
-  
-
-  // Cria uma nova conta
+    // Cria uma nova conta
   static create(data, callback) {
     db.beginTransaction((err) => {
       if (err) return callback(err);
@@ -31,7 +29,7 @@ class Contas {
       }
 
       db.query(
-        "INSERT INTO contas_pagar (descricao, valor, datacriacao, status, dataVencimento) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO contas_receber (descricao, valor, datacriacao, status, dataVencimento) VALUES (?, ?, ?, ?, ?)",
         [
           data.descricao, 
           data.valor, 
@@ -60,7 +58,7 @@ class Contas {
             ]);
 
             db.query(
-              "INSERT INTO parcelas_pagar (conta_pagar_id, numero, descricao, valor, vencimento, datacriacao, status, data_baixa) VALUES ?",
+              "INSERT INTO parcelas_receber (conta_pagar_id, numero, descricao, valor, vencimento, datacriacao, status, data_baixa) VALUES ?",
               [parcelas],
               (err) => {
                 if (err) {
@@ -99,7 +97,7 @@ class Contas {
       }
 
       db.query(
-        "UPDATE contas_pagar SET descricao = ?, valor = ?, datacriacao = ?, status = ?, dataVencimento = ? WHERE contaID = ?",
+        "UPDATE contas_receber SET descricao = ?, valor = ?, datacriacao = ?, status = ?, dataVencimento = ? WHERE contaID = ?",
         [
           data.descricao, 
           data.valor, 
@@ -114,7 +112,7 @@ class Contas {
           }
 
           // Deleta todas as parcelas existentes antes de adicionar as novas
-          db.query("DELETE FROM parcelas_pagar WHERE conta_pagar_id = ?", [id], (err) => {
+          db.query("DELETE FROM parcelas_receber WHERE conta_pagar_id = ?", [id], (err) => {
             if (err) {
               return db.rollback(() => callback(err));
             }
@@ -133,7 +131,7 @@ class Contas {
               ]);
 
               db.query(
-                "INSERT INTO parcelas_pagar (conta_pagar_id, numero, descricao, valor, vencimento, datacriacao, status, data_baixa) VALUES ?",
+                "INSERT INTO parcelas_receber (conta_pagar_id, numero, descricao, valor, vencimento, datacriacao, status, data_baixa) VALUES ?",
                 [parcelas],
                 (err) => {
                   if (err) {
@@ -168,7 +166,7 @@ class Contas {
       if (err) return callback(err);
 
       db.query(
-        "DELETE FROM parcelas_pagar WHERE conta_pagar_id = ?",
+        "DELETE FROM parcelas_receber WHERE conta_pagar_id = ?",
         [id],
         (err) => {
           if (err) {
@@ -176,7 +174,7 @@ class Contas {
           }
 
           db.query(
-            "DELETE FROM contas_pagar WHERE contaID = ?",
+            "DELETE FROM contas_receber WHERE contaID = ?",
             [id],
             (err) => {
               if (err) {
@@ -203,7 +201,7 @@ static updateParcelaStatus(parcelaID, status, data_baixa, callback) {
     return callback(new Error("ID da parcela e status são obrigatórios"));
   }
 
-  const query = "UPDATE parcelas_pagar SET status = ?, data_baixa = ? WHERE parcelaID = ?";
+  const query = "UPDATE parcelas_receber SET status = ?, data_baixa = ? WHERE parcelaID = ?";
   const values = [status, data_baixa || null, parcelaID];
 
   db.query(query, values, (err, result) => {

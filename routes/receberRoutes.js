@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Contas = require("../models/contasModel");
+const Receber = require("../models/receberModel");
 
 // Rota para obter todas as contas
 router.get("/", (req, res) => {
-  Contas.getAll((err, results) => {
+  Receber.getAll((err, results) => {
     if (err) return res.status(500).json({ error: "Erro ao buscar contas: " + err.message });
     res.json(results);
   });
@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 
 // Rota para obter uma conta específica por ID
 router.get("/:id", (req, res) => {
-  Contas.getById(req.params.id, (err, result) => {
+  Receber.getById(req.params.id, (err, result) => {
     if (err) return res.status(500).json({ error: "Erro ao buscar conta: " + err.message });
     if (!result || result.length === 0) return res.status(404).json({ error: "Conta não encontrada" });
     res.json(result[0]); // Retorna um único objeto
@@ -43,7 +43,7 @@ router.post("/", (req, res) => {
     parcelas, // Inclui as parcelas
   };
 
-  Contas.create(novaConta, (err, result) => {
+  Receber.create(novaConta, (err, result) => {
     if (err) return res.status(500).json({ error: "Erro ao criar conta: " + err.message });
     res.status(201).json({ id: result.insertId });
   });
@@ -71,7 +71,7 @@ router.put("/:id", (req, res) => {
     parcelas, // Atualiza as parcelas
   };
 
-  Contas.update(req.params.id, contaAtualizada, (err, result) => {
+  Receber.update(req.params.id, contaAtualizada, (err, result) => {
     if (err) return res.status(500).json({ error: "Erro ao atualizar conta: " + err.message });
     if (result.affectedRows === 0) return res.status(404).json({ error: "Conta não encontrada" });
     res.json({ affectedRows: result.affectedRows });
@@ -80,7 +80,7 @@ router.put("/:id", (req, res) => {
 
 // Rota para excluir uma conta por ID
 router.delete("/:id", (req, res) => {
-  Contas.delete(req.params.id, (err) => {
+  Receber.delete(req.params.id, (err) => {
     if (err) return res.status(500).json({ error: "Erro ao excluir conta: " + err.message });
     res.status(204).end(); // Sem conteúdo após exclusão bem-sucedida
   });
@@ -96,7 +96,7 @@ router.patch("/parcelas/:parcelaID/status", (req, res) => {
     return res.status(400).json({ error: "O status da parcela é obrigatório" });
   }
 
-  Contas.updateParcelaStatus(parcelaID, status, data_baixa, (err) => {
+  Receber.updateParcelaStatus(parcelaID, status, data_baixa, (err) => {
     if (err) return res.status(500).json({ error: "Erro ao atualizar status da parcela: " + err.message });
     res.status(204).end(); // Sem conteúdo após atualização bem-sucedida
   });
@@ -106,12 +106,12 @@ router.patch("/parcelas/:parcelaID/status", (req, res) => {
   const contaId = req.params.id;
 
   // Verifica se a conta existe antes de buscar as parcelas
-  Contas.getById(contaId, (err, result) => {
+  Receber.getById(contaId, (err, result) => {
     if (err) return res.status(500).json({ error: 'Erro ao buscar conta: ' + err.message });
     if (!result || result.length === 0) return res.status(404).json({ error: 'Conta não encontrada' });
 
     // Se a conta existir, busca as parcelas
-    Contas.getParcelas(contaId, (err, parcelas) => {
+    Receber.getParcelas(contaId, (err, parcelas) => {
       if (err) return res.status(500).json({ error: 'Erro ao recuperar parcelas' });
       res.json(parcelas);
     });

@@ -24,7 +24,10 @@ router.post("/login", (req, res) => {
 
     // Exibe os dados do usuário no console para debug
     console.log("Usuário encontrado:", user); // <--- Aqui vamos inspecionar os dados
-
+    
+    if (!user.status || user.status.toLowerCase() === "inativo") {
+      return res.status(403).json({ message: "Acesso negado. Usuário inativo." });
+    }
     // Compara a senha com o hash armazenado
     bcrypt.compare(senha, user.senha, (err, isMatch) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -36,7 +39,12 @@ router.post("/login", (req, res) => {
       });
 
       // Envia o token e o nome completo do usuário como resposta
-      res.json({ token, nomeUsuario: user.usuarioLogin });
+      res.json({
+        token, 
+        nomeUsuario: user.usuarioLogin, 
+        idUsuario: user.usuarioID, // Deixe claro que isso é o ID do usuário
+        nomeCompleto: user.nomeCompleto, // Inclua outras informações relevantes se necessário
+      });
     });
   });
 });

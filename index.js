@@ -23,6 +23,7 @@ app.use("/api/itemvenda", require("./routes/itemvendaRoutes"));
 app.use("/api/relatorios", require("./routes/relatorioRoutes"));
 app.use("/api/representante", require("./routes/representanteRoutes"));
 app.use("/api/relatorio", require("./routes/geradorRelatorioRoutes"));
+app.use("/api/receber", require("./routes/receberRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API is running");

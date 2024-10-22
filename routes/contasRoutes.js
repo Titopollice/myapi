@@ -118,4 +118,32 @@ router.patch("/parcelas/:parcelaID/status", (req, res) => {
   });
 });
 
+router.patch("/parcelas/:parcelaID/status", (req, res) => {
+  const parcelaID = req.params.parcelaID;
+  const { status, data_baixa } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ error: "O status da parcela é obrigatório" });
+  }
+
+  Contas.updateParcelaStatus(parcelaID, status, data_baixa, (err, result) => {
+    if (err) return res.status(500).json({ error: "Erro ao atualizar status da parcela: " + err.message });
+    res.json({
+      message: "Status da parcela atualizado com sucesso",
+      parcelaAtualizada: result.parcelaAtualizada,
+      contaStatus: result.contaStatus
+    });
+  });
+});
+
+router.patch("/:id", (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  Contas.updateStatus(id, status, (err, result) => {
+    if (err) return res.status(500).json({ error: "Erro ao atualizar status da conta: " + err.message });
+    res.json({ message: "Status da conta atualizado com sucesso", updatedConta: result });
+  });
+});
+
 module.exports = router;

@@ -194,26 +194,85 @@ class Contas {
     });
   }
 
-  // Atualiza o status de uma parcela específica
-  // Atualiza o status de uma parcela específica
-static updateParcelaStatus(parcelaID, status, data_baixa, callback) {
-  if (!parcelaID || !status) {
-    return callback(new Error("ID da parcela e status são obrigatórios"));
+  static updateParcelaStatus(parcelaID, status, data_baixa, callback) {
+    db.beginTransaction((err) => {
+      if (err) return callback(err);
+  
+      const query = "UPDATE parcelas_receber SET status = ?, data_baixa = ? WHERE parcelaID = ?";
+      const values = [status, data_baixa || null, parcelaID];
+  
+      db.query(query, values, (err, result) => {
+        if (err) {
+          return db.rollback(() => callback(err));
+        }
+  
+        // Busca o ID da conta associada à parcela
+        db.query("SELECT conta_pagar_id FROM parcelas_receber WHERE parcelaID = ?", [parcelaID], (err, results) => {
+          if (err) {
+            return db.rollback(() => callback(err));
+          }
+  
+          if (results.length === 0) {
+            return db.rollback(() => callback(new Error("Parcela não encontrada")));
+          }
+  
+          const contaId = results[0].conta_pagar_id;
+  
+          // Verifica se todas as parcelas da conta estão baixadas
+          db.query(
+            "SELECT COUNT(*) AS total, SUM(CASE WHEN status = 'Baixada' THEN 1 ELSE 0 END) AS baixadas FROM parcelas_receber WHERE conta_pagar_id = ?",
+            [contaId],
+            (err, results) => {
+              if (err) {
+                return db.rollback(() => callback(err));
+              }
+  
+              const { total, baixadas } = results[0];
+  
+              if (total === baixadas) {
+                // Todas as parcelas estão baixadas, atualiza o status da conta
+                db.query(
+                  "UPDATE contas_receber SET status = 'Concluído' WHERE contaID = ?",
+                  [contaId],
+                  (err) => {
+                    if (err) {
+                      return db.rollback(() => callback(err));
+                    }
+  
+                    db.commit((err) => {
+                      if (err) {
+                        return db.rollback(() => callback(err));
+                      }
+                      callback(null, { parcelaAtualizada: result, contaStatus: 'Concluído' });
+                    });
+                  }
+                );
+              } else {
+                db.commit((err) => {
+                  if (err) {
+                    return db.rollback(() => callback(err));
+                  }
+                  callback(null, { parcelaAtualizada: result, contaStatus: 'Pendente' });
+                });
+              }
+            }
+          );
+        });
+      });
+    });
+  }
+  
+  static updateStatus(id, status, callback) {
+    db.query(
+      "UPDATE contas_receber SET status = ? WHERE contaID = ?",
+      [status, id],
+      (err, result) => {
+        if (err) return callback(err);
+        callback(null, result);
+      }
+    );
   }
 
-  const query = "UPDATE parcelas_receber SET status = ?, data_baixa = ? WHERE parcelaID = ?";
-  const values = [status, data_baixa || null, parcelaID];
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, result);
-  });
 }
-
-}
-
-
 
 module.exports = Contas;

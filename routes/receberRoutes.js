@@ -91,14 +91,17 @@ router.patch("/parcelas/:parcelaID/status", (req, res) => {
   const parcelaID = req.params.parcelaID;
   const { status, data_baixa } = req.body;
 
-  // Validação dos dados
   if (!status) {
     return res.status(400).json({ error: "O status da parcela é obrigatório" });
   }
 
-  Receber.updateParcelaStatus(parcelaID, status, data_baixa, (err) => {
+  Receber.updateParcelaStatus(parcelaID, status, data_baixa, (err, result) => {
     if (err) return res.status(500).json({ error: "Erro ao atualizar status da parcela: " + err.message });
-    res.status(204).end(); // Sem conteúdo após atualização bem-sucedida
+    res.json({
+      message: "Status da parcela atualizado com sucesso",
+      parcelaAtualizada: result.parcelaAtualizada,
+      contaStatus: result.contaStatus
+    });
   });
 });
 
@@ -115,6 +118,35 @@ router.patch("/parcelas/:parcelaID/status", (req, res) => {
       if (err) return res.status(500).json({ error: 'Erro ao recuperar parcelas' });
       res.json(parcelas);
     });
+  });
+});
+
+// Rota para atualizar o status de uma conta específica
+router.patch("/:id", (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ error: "O status da conta é obrigatório" });
+  }
+
+  Receber.updateStatus(id, status, (err, result) => {
+    if (err) return res.status(500).json({ error: "Erro ao atualizar status da conta: " + err.message });
+    res.json({ message: "Status da conta atualizado com sucesso", updatedConta: result });
+  });
+});
+
+router.patch("/:id/status", (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ error: "O status da conta é obrigatório" });
+  }
+
+  Receber.updateStatus(id, status, (err, result) => {
+    if (err) return res.status(500).json({ error: "Erro ao atualizar status da conta: " + err.message });
+    res.json({ message: "Status da conta atualizado com sucesso", updatedConta: result });
   });
 });
 

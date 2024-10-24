@@ -9,54 +9,41 @@ class Estoque {
     db.query("SELECT * FROM estoque WHERE idEstoque = ?", [id], callback);
   }
 
-  static create(data, callback) {
-    // Início de uma transação para garantir consistência nos dados
-    db.beginTransaction((err) => {
-      if (err) return callback(err);
-
-      // Inserir na tabela de estoque
-      db.query(
-        "INSERT INTO estoque (quantidade, DataDaMovimentacao, Produto_produtoID, IdFornecedor) VALUES (?, ?, ?, ?)",
-        [
-          data.quantidade,
-          data.DataDaMovimentacao,
-          data.Produto_produtoID,
-          data.IdFornecedor,
-        ],
-        (err, result) => {
-          if (err) {
-            return db.rollback(() => {
-              callback(err);
-            });
-          }
-
-          // Atualizar o campo 'estoque' na tabela produto
-          db.query(
-            "UPDATE produto SET estoque = estoque + ? WHERE produtoID = ?",
-            [data.quantidade, data.Produto_produtoID],
-            (err, result) => {
-              if (err) {
-                return db.rollback(() => {
-                  callback(err);
+  static create(data) {
+    return new Promise((resolve, reject) => {
+      db.beginTransaction(err => {
+        if (err) reject(err);
+  
+        db.query(
+          "INSERT INTO estoque (quantidade, DataDaMovimentacao, Produto_produtoID, IdFornecedor) VALUES (?, ?, ?, ?)",
+          [data.quantidade, data.DataDaMovimentacao, data.Produto_produtoID, data.IdFornecedor],
+          (err, result) => {
+            if (err) {
+              return db.rollback(() => reject(err));
+            }
+  
+            db.query(
+              "UPDATE produto SET estoque = estoque + ? WHERE produtoID = ?",
+              [data.quantidade, data.Produto_produtoID],
+              (err, updateResult) => {
+                if (err) {
+                  return db.rollback(() => reject(err));
+                }
+  
+                db.commit(err => {
+                  if (err) {
+                    return db.rollback(() => reject(err));
+                  }
+                  resolve(result); // Retorna o resultado da inserção
                 });
               }
-
-              // Se tudo deu certo, comitar a transação
-              db.commit((err) => {
-                if (err) {
-                  return db.rollback(() => {
-                    callback(err);
-                  });
-                }
-                callback(null, result);
-              });
-            }
-          );
-        }
-      );
+            );
+          }
+        );
+      });
     });
   }
-
+  
   static update(id, data, callback) {
     db.beginTransaction((err) => {
       if (err) return callback(err);

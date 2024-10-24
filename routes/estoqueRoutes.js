@@ -37,7 +37,11 @@ router.post("/", async (req, res) => {
 
   try {
     const result = await Estoque.create(req.body);
-    res.status(201).json({ id: result.insertId });
+    if (result && result.insertId) {
+      res.status(201).json({ id: result.insertId });
+    } else {
+      res.status(500).json({ error: "Falha ao inserir no estoque." });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

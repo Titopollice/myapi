@@ -12,7 +12,7 @@ app.use("/api/categoriaproduto", require("./routes/categoriaProdutoRoutes"));
 app.use("/api/endereco", require("./routes/enderecoRoutes"));
 app.use("/api/cliente", require("./routes/clienteRoutes"));
 app.use("/api/contato", require("./routes/contatoRoutes"));
-app.use("/api/tipousuario", require("./routes/tipousuarioRoutes"));
+app.use("/api/tipousuario", require("./routes/tipoUsuarioRoutes"));
 app.use("/api/usuario", require("./routes/usuarioRoutes"));
 app.use("/api/fornecedor", require("./routes/fornecedorRoutes"));
 app.use("/api/contas", require("./routes/contasRoutes"));

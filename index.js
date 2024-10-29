@@ -8,6 +8,8 @@ app.use(cors());
 
 app.use(express.json());
 
+const PORT = process.env.PORT || 3000; 
+
 app.use("/api/categoriaproduto", require("./routes/categoriaProdutoRoutes"));
 app.use("/api/endereco", require("./routes/enderecoRoutes"));
 app.use("/api/cliente", require("./routes/clienteRoutes"));

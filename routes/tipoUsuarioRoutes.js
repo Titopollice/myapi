@@ -1,7 +1,7 @@
 // routes/tipousuario.js
 const express = require("express");
 const router = express.Router();
-const TipoUsuario = require("../models/TipoUsuarioModel");
+const TipoUsuario = require("../models/tipoUsuarioModel");
 
 router.get("/", (req, res) => {
   TipoUsuario.getAll((err, results) => {

@@ -5,7 +5,8 @@ const app = express();
 
 // // Configura o CORS para permitir apenas o domínio da Vercel
 const corsOptions = {
-  origin: ["https://erp-adegas.vercel.app"], // Substitua pela URL do seu front-end na Vercel
+  origin: ["*"], // Substitua pela URL do seu front-end na Vercel
+  // origin: ["https://erp-adegas.vercel.app"], // Substitua pela URL do seu front-end na Vercel
   optionsSuccessStatus: 200,
 };
 app.use(cors());

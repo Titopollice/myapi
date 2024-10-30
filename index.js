@@ -1,11 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const oasGenerator = require('express-oas-generator');
 const cors = require("cors");
 const app = express();
-
-// Inicializa o OAS Generator para documentação automática
-oasGenerator.init(app, {});
 
 // Configura o CORS para permitir apenas o domínio da Vercel
 const corsOptions = {

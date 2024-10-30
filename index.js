@@ -1,15 +1,14 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const cors = require("cors");
 const app = express();
 
-// Configura o CORS para permitir apenas o domínio da Vercel
+// // Configura o CORS para permitir apenas o domínio da Vercel
 const corsOptions = {
-  origin: ['https://erp-adegas.vercel.app'], // Substitua pela URL do seu front-end na Vercel
-  optionsSuccessStatus: 200
+  origin: ["https://erp-adegas.vercel.app"], // Substitua pela URL do seu front-end na Vercel
+  optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
-
+app.use(cors());
 app.use(express.json());
 
 const port = process.env.PORT || 8080;

@@ -1,15 +1,24 @@
-const express = require("express");
-const cors = require("cors"); // Importar o pacote cors
+require('dotenv').config();
+const express = require('express');
+const oasGenerator = require('express-oas-generator');
+const cors = require("cors");
 const app = express();
-const port = 8080;
 
-// Usar o middleware CORS para permitir requisições de origens diferentes
-app.use(cors());
+// Inicializa o OAS Generator para documentação automática
+oasGenerator.init(app, {});
+
+// Configura o CORS para permitir apenas o domínio da Vercel
+const corsOptions = {
+  origin: ['https://erp-adegas.vercel.app'], // Substitua pela URL do seu front-end na Vercel
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000; 
+const port = process.env.PORT || 8080;
 
+// Importação das rotas
 app.use("/api/categoriaproduto", require("./routes/categoriaProdutoRoutes"));
 app.use("/api/endereco", require("./routes/enderecoRoutes"));
 app.use("/api/cliente", require("./routes/clienteRoutes"));
@@ -27,10 +36,12 @@ app.use("/api/representante", require("./routes/representanteRoutes"));
 app.use("/api/relatorio", require("./routes/geradorRelatorioRoutes"));
 app.use("/api/receber", require("./routes/receberRoutes"));
 
+// Rota de teste para verificar se a API está rodando
 app.get("/", (req, res) => {
   res.send("API is running");
 });
 
+// Inicializar o servidor
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

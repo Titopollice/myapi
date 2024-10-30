@@ -1,14 +1,13 @@
 const express = require("express");
 const cors = require("cors"); // Importar o pacote cors
 const app = express();
-const port = 8080;
 
 // Usar o middleware CORS para permitir requisições de origens diferentes
 app.use(cors());
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 8080; 
 
 app.use("/api/categoriaproduto", require("./routes/categoriaProdutoRoutes"));
 app.use("/api/endereco", require("./routes/enderecoRoutes"));
@@ -31,6 +30,6 @@ app.get("/", (req, res) => {
   res.send("API is running");
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

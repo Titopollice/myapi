@@ -128,7 +128,7 @@ exports.forgotPassword = (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
 
         // Enviar e-mail de recuperação
-        const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+        const resetURL = `https://erp-adegas.vercel.app/reset-password/${resetToken}`;
         const mailOptions = {
           to: user.email,
           from: process.env.EMAIL_USER,
